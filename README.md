@@ -2,6 +2,9 @@
 
 This is a draft service to predict private housing prices from URA's data API
 
+Basic Pipeline
+![image](https://github.com/user-attachments/assets/f468d8bb-de94-4d5a-90f7-804ea71b8fc3)
+
 Run Service
 ```
 1. docker-compose build
