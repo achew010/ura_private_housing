@@ -13,7 +13,7 @@ Run Service
 ```
 
 
-Send Request
+Send Request, predicted response will be in $/sqm
 ```
     import requests
 

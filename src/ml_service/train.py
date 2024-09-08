@@ -13,7 +13,7 @@ def train_model(df: pd.DataFrame):
         dataset = feature_engineer(df)
         X_train, X_test, Y_train, Y_test = split(dataset)
 
-        ohe = OneHotEncoder()
+        ohe = OneHotEncoder(handle_unknown='ignore')
         mms = MinMaxScaler()
 
         X_train_encoded = encode(X_train, ohe, mms, fit=True)

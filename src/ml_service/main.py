@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import pickle
 import numpy as np
-from utils import feature_engineer, encode
+from utils import feature_engineer, predict_encode
 import pandas as pd
 
 # Initialize FastAPI app
@@ -58,7 +58,7 @@ async def predict(request: PredictRequest):
 
     # filter and transform
     dataset = feature_engineer(input_data, predict=True)
-    dataset_encoded = encode(dataset, ohe, mms, fit=False)
+    dataset_encoded = predict_encode(dataset, ohe, mms, fit=False)
 
     # Get the prediction from the model
     prediction = model.predict(dataset_encoded)

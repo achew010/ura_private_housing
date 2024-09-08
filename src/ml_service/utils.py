@@ -59,8 +59,8 @@ def feature_engineer(df:pd.DataFrame, predict=False):
         raw = df[df['propertytype']=='Executive Condominium']
     if predict:
         raw["lease_commencement"] = str(raw["tenure"])[-4:]
-        raw["tx_month"] = str(raw["contractdate"].values[0][0])[:-2]
-        raw["tx_year"] = str(raw["contractdate"].values[0][0])[-2:]
+        raw["tx_month"] = int(raw["contractdate"].iloc[0,0][:-2])
+        raw["tx_year"] = int(raw["contractdate"].iloc[0,0][-2:])
         raw['num_years_from_tenure'] = (2000 + int(raw["tx_year"].iloc[0,0])) - int(raw["lease_commencement"].iloc[0,0])
         return raw[['street', 'project', 'marketsegment',
             'area', 'floorrange',
@@ -87,13 +87,21 @@ def split(dataset):
         X, Y, test_size=0.2, random_state=42)
     return X_train, X_test, Y_train, Y_test
 
+def predict_encode(X, ohe, mms, fit=False):
+    continuous_vars = ['area'] #, 'neighbour_median_price_per_sqm'
+    tmp = X[[col[0] for col in X.columns if col[0] not in continuous_vars]].values[0].reshape(1, -1)
+    X_ohe = ohe.transform(tmp).toarray()
+    X_scaled = mms.transform(X[[col[0] for col in X.columns if col[0] in continuous_vars]])
+    return np.concatenate([X_ohe, X_scaled], axis=-1)
+
+
 def encode(X, ohe, mms, fit=False):
     continuous_vars = ['area'] #, 'neighbour_median_price_per_sqm'
     if fit:
         X_ohe = ohe.fit_transform(X[[col for col in X.columns if col not in continuous_vars]]).toarray()
         X_scaled = mms.fit_transform(X[[col for col in X.columns if col in continuous_vars]])
     else:
-        X_ohe = ohe.transform(X[[col[0] for col in X.columns if col[0] not in continuous_vars]]).toarray()
+        X_ohe = ohe.transform(X[[col for col in X.columns if col not in continuous_vars]]).toarray()
         X_scaled = mms.transform(X[[col for col in X.columns if col in continuous_vars]])
     return np.concatenate([X_ohe, X_scaled], axis=-1)
 
