@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: uradb
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./src/db/db_init.sql:/docker-entrypoint-initdb.d/init.sql # Optional: run initial SQL setup
+    ports:
+      - "5432:5432"
+  backend:
+    build: ./src/backend
+    environment:
+      DATABASE_URL: postgres://user:password@db:5432/uradb
+      URA_ACCESS_KEY: ${URA_ACCESS_KEY} # API key from .env file
+      URA_API_TOKEN: ${URA_API_TOKEN} # API key from .env file
+      PYTHONPATH: /usr/src/db_utils/:$PYTHONPATH
+    depends_on:
+      - db
+    volumes:
+      - ./src/backend/:/usr/src/app
+      - ./src/db/db_utils/:/usr/src/db_utils
+    command: [ "sh", "run.sh" ]
+    restart: always
+  ml_service:
+    build: ./src/ml_service
+    environment:
+      DATABASE_URL: postgres://user:password@db:5432/uradb # Connect to the same database
+      PYTHONPATH: /usr/src/db_utils/:/usr/src/ml_service:$PYTHONPATH
+    depends_on:
+      - db
+      - backend
+    volumes:
+      - ./src/ml_service:/usr/src/ml_service
+      - ./src/db/db_utils/:/usr/src/db_utils
+    command: [ "sh", "run.sh" ]
+    ports:
+      - "8000:8000"
+    restart: always
+
+volumes:
+  db_data:
