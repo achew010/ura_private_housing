@@ -1,3 +1,13 @@
+## Description
+
+This is a draft service to predict private housing prices from URA's data API
+
+Run Service
+```
+1. docker-compose build
+
+2. docker-compose up
+```
 
 
 Send Request

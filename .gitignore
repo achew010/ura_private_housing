@@ -1,3 +1,5 @@
 .env
 data/
 model/
+__pycache__/
+ipynb_checkpoints/
